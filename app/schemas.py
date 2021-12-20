@@ -1,6 +1,6 @@
 # https://pydantic-docs.helpmanual.io/
 from pydantic import BaseModel
-
+from datetime import datetime
 # request schema
 
 
@@ -12,3 +12,11 @@ class PostBase(BaseModel):
 
 class PostCreate(PostBase):
     pass
+
+
+class Post(PostBase):
+    id: int
+    created_at: datetime
+
+    class Config:
+        orm_mode = True
