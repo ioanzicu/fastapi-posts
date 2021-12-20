@@ -1,11 +1,18 @@
 # https://fastapi.tiangolo.com/
 # https://pydantic-docs.helpmanual.io/
+# https://www.sqlalchemy.org/
 
 import psycopg2
 import time
 from psycopg2.extras import RealDictCursor
-from fastapi import FastAPI, Response, status, HTTPException
+from fastapi import FastAPI, Response, status, HTTPException, Depends
 from pydantic import BaseModel
+from sqlalchemy.orm.session import Session
+from . import models
+from .database import engine, get_db
+
+
+models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
@@ -53,6 +60,11 @@ def remove_from_array(index):
 @app.get('/')
 async def root():
     return {'message': 'Hello Fast Py!!!'}
+
+
+@app.get('/sqlalchemy')
+def test_posts(db: Session = Depends(get_db)):
+    return {'status': 'success'}
 
 
 @app.get('/posts')
