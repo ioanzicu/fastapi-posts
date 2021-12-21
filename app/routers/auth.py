@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from ..database import get_db
 from ..schemas import UserLogin
 from ..models import User
-from .. import utils
+from .. import utils, oauth2
 
 router = APIRouter(tags=['Authentication'])
 
@@ -21,5 +21,6 @@ def login(user_credentials: UserLogin, db: Session = Depends(get_db)):
             status_code=status.HTTP_404_NOT_FOUND, detail=f'Invalid Credentials')
 
     # create a token
+    access_token = oauth2.create_access_token(data={'user_id': user.id})
 
-    return {'token': 'example token'}
+    return {'access_token': access_token, "token_type": "bearer"}
