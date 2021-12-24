@@ -4,6 +4,7 @@ from pydantic import BaseModel
 from datetime import datetime
 
 from pydantic.networks import EmailStr
+
 # request schema
 
 
@@ -53,3 +54,8 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+
+class Vote(BaseModel):
+    post_id: int
+    voted: bool
