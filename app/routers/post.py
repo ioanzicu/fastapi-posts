@@ -1,9 +1,10 @@
 from fastapi import Response, status, HTTPException, Depends, APIRouter
 from sqlalchemy.orm.session import Session
+from sqlalchemy.sql.functions import func
 from app import oauth2
 from .. import models
 from ..database import get_db
-from ..schemas import PostCreate, Post
+from ..schemas import PostCreate, Post, PostOut
 from .. import oauth2
 from typing import List, Optional
 
@@ -13,32 +14,41 @@ router = APIRouter(
 )
 
 
-@router.get('/', response_model=List[Post])
+@router.get('/', response_model=List[PostOut])
 def get_posts(db: Session = Depends(get_db),
-              user_id: int = Depends(oauth2.get_current_user),
+              current_user: int = Depends(oauth2.get_current_user),
               limit: int = 10,
               skip: int = 0,
               search: Optional[str] = ''):
-    posts = db.query(models.Posts).filter(models.Posts.title.contains(
+
+    posts = db.query(models.Post).filter(models.Post.title.contains(
         search)).limit(limit=limit).offset(offset=skip).all()
 
-    return posts
+    results = db.query(models.Post, func.count(models.Vote.post_id).label('votes')).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).filter(models.Post.title.contains(
+            search)).limit(limit=limit).offset(offset=skip).all()
+
+    return results
 
 
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=Post)
 def create_posts(post: PostCreate,
                  db: Session = Depends(get_db),
                  current_user: int = Depends(oauth2.get_current_user)):
-    post = models.Posts(owner_id=current_user.id, **post.dict())
+    post = models.Post(owner_id=current_user.id, **post.dict())
     db.add(post)
     db.commit()
     db.refresh(post)
     return post
 
 
-@ router.get('/{id}', response_model=Post)
-def get_post(id: int,  db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    post = db.query(models.Posts).filter(models.Posts.id == id).first()
+@ router.get('/{id}', response_model=PostOut)
+def get_post(id: int,
+             db: Session = Depends(get_db),
+             current_user: int = Depends(oauth2.get_current_user)):
+
+    post = db.query(models.Post, func.count(models.Vote.post_id).label('votes')).join(
+        models.Vote, models.Vote.post_id == models.Post.id, isouter=True).group_by(models.Post.id).first()
 
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -47,8 +57,10 @@ def get_post(id: int,  db: Session = Depends(get_db), current_user: int = Depend
 
 
 @ router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    post_query = db.query(models.Posts).filter(models.Posts.id == id)
+def delete_post(id: int,
+                db: Session = Depends(get_db),
+                current_user: int = Depends(oauth2.get_current_user)):
+    post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
 
     if post == None:
@@ -65,8 +77,11 @@ def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depe
 
 
 @ router.put('/{id}', response_model=Post)
-def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
-    post_query = db.query(models.Posts).filter(models.Posts.id == id)
+def update_post(id: int,
+                updated_post: PostCreate,
+                db: Session = Depends(get_db),
+                current_user: int = Depends(oauth2.get_current_user)):
+    post_query = db.query(models.Post).filter(models.Post.id == id)
     post = post_query.first()
 
     if post == None:
