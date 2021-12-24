@@ -22,7 +22,7 @@ def get_posts(db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_c
 @router.post('/', status_code=status.HTTP_201_CREATED, response_model=Post)
 def create_posts(post: PostCreate,
                  db: Session = Depends(get_db),
-                 user_id: int = Depends(oauth2.get_current_user)):
+                 current_user: int = Depends(oauth2.get_current_user)):
     post = models.Posts(**post.dict())
     db.add(post)
     db.commit()
@@ -31,7 +31,7 @@ def create_posts(post: PostCreate,
 
 
 @ router.get('/{id}', response_model=Post)
-def get_post(id: int,  db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def get_post(id: int,  db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post = db.query(models.Posts).filter(models.Posts.id == id).first()
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -40,7 +40,7 @@ def get_post(id: int,  db: Session = Depends(get_db), user_id: int = Depends(oau
 
 
 @ router.delete('/{id}', status_code=status.HTTP_204_NO_CONTENT)
-def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def delete_post(id: int, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post = db.query(models.Posts).filter(models.Posts.id == id)
     if post.first() == None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
@@ -52,7 +52,7 @@ def delete_post(id: int, db: Session = Depends(get_db), user_id: int = Depends(o
 
 
 @ router.put('/{id}', response_model=Post)
-def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db), user_id: int = Depends(oauth2.get_current_user)):
+def update_post(id: int, updated_post: PostCreate, db: Session = Depends(get_db), current_user: int = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Posts).filter(models.Posts.id == id)
     post = post_query.first()
     if post == None:
