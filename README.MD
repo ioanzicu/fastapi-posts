@@ -29,3 +29,10 @@
 ## Generate SECRET_KEY
 
     openssl rand -hex 32
+
+
+## Push changes
+
+    git push origin main
+    git push heroku main
+    heroku run "alembic upgrade head"
