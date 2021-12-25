@@ -1,13 +1,31 @@
-uvicorn app.main:app --reload
+## Install libraries
+
+    pip install -r requirements.txt
 
 
-alembic current 
-alembic upgrade head 
-alembic upgrade +1
-alembic downgrade -1
-alembic history
-alembic heads
+## Start the server
+
+    uvicorn app.main:app --reload
+
+## Heroku
+
+    heroku ps --help
+    heroku ps:restart
+    heroku apps:info <app_name>
+    heroku run "alembic upgrade head"
 
 
+## Alembic commands for database migration 
 
-pip install -r requirements.txt
+    alembic current 
+    alembic upgrade head 
+    alembic upgrade +1
+    alembic downgrade -1
+    alembic history
+    alembic heads
+    alembic revision --autogenerate -m "revision x"
+
+
+## Generate SECRET_KEY
+
+    openssl rand -hex 32
