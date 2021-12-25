@@ -1,5 +1,6 @@
 # https://fastapi.tiangolo.com/
 # https://www.sqlalchemy.org/
+# https://alembic.sqlalchemy.org/en/latest/
 
 
 from fastapi import FastAPI
@@ -7,8 +8,8 @@ from . import models
 from .database import engine
 from .routers import post, user, auth, vote
 
-
-models.Base.metadata.create_all(bind=engine)
+# Needed for sqlalchemy but not needed for alembic
+# models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
