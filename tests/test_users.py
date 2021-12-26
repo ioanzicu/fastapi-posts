@@ -18,7 +18,10 @@ TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)
 
 
-def override_get_db():
+@pytest.fixture
+def session():
+    Base.metadata.drop_all(bind=engine)  # drop tables
+    Base.metadata.create_all(bind=engine)  # create tables
     db = TestingSessionLocal()
     try:
         yield db
@@ -26,27 +29,17 @@ def override_get_db():
         db.close()
 
 
-app.dependency_overrides[get_db] = override_get_db
-
-
 # runs before each test
 @pytest.fixture
-def client():
-    Base.metadata.drop_all(bind=engine)  # drop tables
-    # set up - run out code before we run our test
-    Base.metadata.create_all(bind=engine)  # create tables
+def client(session):  # will run after session fixture
+    def override_get_db():
+        try:
+            yield session
+        finally:
+            session.close()
+
+    app.dependency_overrides[get_db] = override_get_db
     yield TestClient(app)
-    # cleanup - run our test after our test finished
-
-    # OR
-    # Base.metadata.create_all(bind=engine) # create tables
-    # yield TestClient(app)
-    # Base.metadata.drop_all(bind=engine)  # drop tables
-
-    # OR - alembic
-    # command.upgrade('head')
-    # yield TestClient(app)
-    # command.downgrade('base')
 
 
 def test_root(client):
