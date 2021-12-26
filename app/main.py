@@ -1,6 +1,7 @@
 # https://fastapi.tiangolo.com/
 # https://www.sqlalchemy.org/
 # https://alembic.sqlalchemy.org/en/latest/
+# https://docs.pytest.org/en/6.2.x/
 
 
 from fastapi import FastAPI

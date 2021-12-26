@@ -82,3 +82,16 @@
     docker-compose -f docker-compose-prod.yml up -d
     docker-compose -f docker-compose-prod.yml down
     
+
+## Pytest
+
+    pytest -v -s
+    pytest -v -s .\tests\test_users.py
+    pytest --disable-warnings -v -x
+
+## References
+
+ - https://fastapi.tiangolo.com/
+ - https://www.sqlalchemy.org/
+ - https://alembic.sqlalchemy.org/en/latest/
+ - https://docs.pytest.org/en/6.2.x/
