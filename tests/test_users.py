@@ -3,17 +3,6 @@ from jose import jwt
 from fastapi import status
 from app import schemas
 from app.config import settings
-from .database import client, session
-
-
-@pytest.fixture
-def test_user(client):
-    user_data = {'email': 'thebest-alpaca@mail.com', 'password': 'alpaca1234'}
-    responses = client.post('/users/', json=user_data)
-    assert responses.status_code == status.HTTP_201_CREATED
-    new_user = responses.json()
-    new_user['password'] = user_data['password']
-    return new_user
 
 
 def test_root(client):
@@ -44,3 +33,23 @@ def test_login_user(client, test_user):
     assert id == test_user.get('id')
     assert login_response.token_type == 'bearer'
     assert response.status_code == status.HTTP_200_OK
+
+
+@pytest.mark.parametrize('email, password, status_code, detail', [
+    ('WrongEmail@gmail.com', 'alpaca1234',
+     status.HTTP_403_FORBIDDEN, 'Invalid Credentials'),
+    ('thebest-alpaca@mail.com', 'wrong_PassworD',
+     status.HTTP_403_FORBIDDEN, 'Invalid Credentials'),
+    ('WrongEmail@gmail.com', 'wrong_PassworD',
+     status.HTTP_403_FORBIDDEN, 'Invalid Credentials'),
+    (None, 'wrong_PassworD', 422, [{'loc': [
+     'body', 'username'], 'msg': 'field required', 'type': 'value_error.missing'}]),
+    ('thebest-alpaca@mail.com', None, 422,
+     [{'loc': ['body', 'password'], 'msg': 'field required', 'type': 'value_error.missing'}])
+])
+def test_incorrect_login(client, test_user, email, password, status_code, detail):
+    response = client.post(
+        '/login', data={'username': email, 'password': password})
+
+    assert response.status_code == status_code
+    assert response.json().get('detail') == detail
