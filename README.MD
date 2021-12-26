@@ -36,3 +36,35 @@
     git push origin main
     git push heroku main
     heroku run "alembic upgrade head"
+
+## Docker
+
+    docker build --help
+    docker build -t fastapi .
+    docker image ls
+
+    docker ps
+    docker run -d --name <container-name> <image-name>
+    docker exec -it <container-name> bash
+    docker stop <container-name>
+    docker rm <container-name>
+    docker rmi <image-id>
+
+    docker run -d -p 8000:8000 fastapi 
+    docker stop <container-id>
+    docker rmi <image-id>
+    docker rmi -f <image-id>
+    docker kill <container-id>
+
+    docker exec -it <container-name> bash
+
+## Docker Compose
+
+    docker-compose up --help
+    docker-compose up -d
+    docker-compose up -d --build
+    docker-compose down
+    
+    docker logs <app_name>
+    docker-compose run <app-name> <command>
+    docker-compose run api        alembic upgrade head

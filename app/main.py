@@ -33,4 +33,4 @@ app.include_router(vote.router)
 
 @app.get('/')
 async def root():
-    return {'message': 'Hello Fast Py!!! ;)'}
+    return {'message': 'Hi, I see that a good man is visiting us. I am glad that you opened this app. Wish you a good day! ;)'}
