@@ -15,7 +15,7 @@ TestingSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=engine)
 
 
-@pytest.fixture
+@pytest.fixture(scope='function')
 def session():
     Base.metadata.drop_all(bind=engine)  # drop tables
     Base.metadata.create_all(bind=engine)  # create tables
@@ -27,7 +27,7 @@ def session():
 
 
 # runs before each test
-@pytest.fixture
+@pytest.fixture(scope='function')
 def client(session):  # will run after session fixture
     def override_get_db():
         try:
