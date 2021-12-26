@@ -68,3 +68,17 @@
     docker logs <app_name>
     docker-compose run <app-name> <command>
     docker-compose run api        alembic upgrade head
+
+    docker image tag --help
+    docker image tag <container-name> <new-name>
+    docker image tag <container-name> iro33/fastapi
+    docker push iro33/fastapi:latest
+
+    Run / Stop dev environment
+    docker-compose -f docker-compose-dev.yml up -d
+    docker-compose -f docker-compose-dev.yml down
+    
+    Run / Stop prod environment
+    docker-compose -f docker-compose-prod.yml up -d
+    docker-compose -f docker-compose-prod.yml down
+    
