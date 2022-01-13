@@ -1,3 +1,12 @@
+# App on Heroku
+
+    https://fastapi-posts-rest.herokuapp.com/
+
+## API docs
+    https://fastapi-posts-rest.herokuapp.com/docs
+
+    https://fastapi-posts-rest.herokuapp.com/redoc
+
 ## Install libraries
 
     pip install -r requirements.txt
