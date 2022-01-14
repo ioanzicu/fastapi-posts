@@ -55,6 +55,17 @@ def test_user(client):
 
 
 @pytest.fixture
+def test_user2(client):
+    user_data = {'email': 'thebest-elephant@mail.com',
+                 'password': 'elephant1234'}
+    responses = client.post('/users/', json=user_data)
+    assert responses.status_code == status.HTTP_201_CREATED
+    new_user = responses.json()
+    new_user['password'] = user_data['password']
+    return new_user
+
+
+@pytest.fixture
 def token(test_user):
     return create_access_token({'user_id': test_user['id']})
 
@@ -70,7 +81,7 @@ def authorized_client(client, token):
 
 
 @pytest.fixture
-def test_posts(test_user, session):
+def test_posts(test_user, session, test_user2):
     posts_data = [{
         'title': 'First the best',
         'content': 'The first is the best if the first is not from the tail of the queue',
@@ -83,6 +94,10 @@ def test_posts(test_user, session):
         'title': 'Number 3 is a magic number',
         'content': 'Minimu perfect and unpredictable number',
         'owner_id': test_user['id']
+    }, {
+        'title': 'Number 13 is not so bad',
+        'content': 'Even if it is friday 13, it is not alawys bad',
+        'owner_id': test_user2['id']
     }]
 
     for post in posts_data:
