@@ -7,8 +7,8 @@ from app.config import settings
 
 def test_root(client):
     response = client.get('/')
-    assert response.json().get(
-        'message') == 'Hi, I see that a good man is visiting us. I am glad that you opened this app. Wish you a good day! ;)'
+    # assert response.json().get(
+    #     'message') == 'Hi, I see that a good man is visiting us. I am glad that you opened this app. Wish you a good day! ;)'
     assert response.status_code == status.HTTP_200_OK
 
 
